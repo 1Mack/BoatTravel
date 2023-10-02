@@ -10,7 +10,7 @@ const errorHandler: ErrorRequestHandler = (error, request, response, next) => {
     let errors: ValidationErrors = {};
 
     error.inner.forEach((err) => {
-      errors[err.path] = err.errors;
+      if (err && err.path) errors[err.path] = err.errors;
     });
 
     return response.json({ message: 'Validation failed', error: errors }).status(404)
@@ -18,7 +18,7 @@ const errorHandler: ErrorRequestHandler = (error, request, response, next) => {
 
   if (error.message.includes('Unique constraint'))
     return response.json({ message: `There is already a data registered with the value of the field ${error.meta.target}`, error }).status(400)
-    
+
   return response.json({ message: 'Internal server error', error }).status(500)
 }
 
