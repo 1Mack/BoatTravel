@@ -18,7 +18,15 @@ export default {
         orderBy: { date_appointment: 'desc' },
         where: { user_id: id },
         include: {
-          boat: { include: { user: { select: { full_name: true } } } },
+          boat: {
+            include: {
+              user: {
+                select: {
+                  full_name: true
+                }
+              }
+            }
+          },
           user: {
             select: {
               id: true,

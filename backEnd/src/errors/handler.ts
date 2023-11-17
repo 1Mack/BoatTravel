@@ -13,13 +13,13 @@ const errorHandler: ErrorRequestHandler = (error, request, response, next) => {
       if (err && err.path) errors[err.path] = err.errors;
     });
 
-    return response.json({ message: 'Validation failed', error: errors }).status(404)
+    return response.status(400).json({ message: 'Validation failed', error: errors })
   }
 
   if (error.message.includes('Unique constraint'))
-    return response.json({ message: `There is already a data registered with the value of the field ${error.meta.target}`, error }).status(400)
+    return response.status(400).json({ message: `There is already a data registered with the value of the field ${error.meta.target}`, error })
 
-  return response.json({ message: 'Internal server error', error }).status(500)
+  return response.status(500).json({ message: 'Internal server error', error })
 }
 
 export default errorHandler;

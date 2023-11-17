@@ -1,8 +1,6 @@
 import axios from 'axios'
-import config from '../../config'
-
 const api = axios.create({
-  baseURL: `http://${config.IP}:${config.PORT}`
+  baseURL: `http://${process.env.EXPO_PUBLIC_IP}:${process.env.EXPO_PUBLIC_PORT}`
 })
 
 export default api

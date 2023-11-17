@@ -19,9 +19,9 @@ export default function ensureAuthenticated(
   if (!authHeader) {
     throw new AppError('Token JWT está faltando', 401);
   }
-  // Bearer ddsdhsdsh
+
   const [, token] = authHeader.split(' ');
-  
+
   try {
     const decoded = verify(token, authConfig.jwt.secret);
     const { sub } = decoded as TokenPayload;

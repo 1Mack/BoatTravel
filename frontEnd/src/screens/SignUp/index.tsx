@@ -8,7 +8,7 @@ import { Background } from "../../components/Background";
 import Logo from '../../assets/logo.png'
 import api from "../../services/api";
 import { Title } from "../Login/styles";
-
+import { Masks } from 'react-native-mask-input'
 
 import { ButtonSignUp } from '../../components/ButtonSignUp';
 
@@ -22,26 +22,35 @@ import {
 } from './styles';
 
 
-interface FormInfos {
+interface IFormInfos {
   full_name: string;
   telefone: string;
-  age: number;
+  age: string | number;
   email: string;
   cpf: string;
   password: string;
 }
+interface IFormInfosHandle extends IFormInfos {
+  age: string
+}
+
 type loginScreenProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
 export function SignUp() {
   const navigation = useNavigation<loginScreenProp>()
 
-  const { control, handleSubmit, formState: { errors } } = useForm();
+  const { control, handleSubmit, formState: { errors } } = useForm<IFormInfosHandle>();
 
-  async function onSubmit(infos: FormInfos) {
+  async function onSubmit(infos: IFormInfos) {
     infos.age = Number(infos.age)
-    const { data } = await api.post('/users', infos)
-    if (!data['errors']) {
+
+    try {
+      const response = await api.post('/users', infos)
+      if (response.data['error']) throw new Error('erro')
       navigation.navigate('Login')
+    } catch (error) {
+      console.log(error)
+      return Alert.alert('Erro ao cadastrar conta')
     }
   }
 
@@ -64,11 +73,9 @@ export function SignUp() {
               onChangeText={onChange}
               value={value}
               autoCapitalize='words'
-             
               placeholder="Nome Completo"
               placeholderTextColor='grey'
-            >
-            </Input>
+            />
           )}
           name="full_name"
         />
@@ -87,10 +94,7 @@ export function SignUp() {
               autoCapitalize="none"
               placeholder="Email"
               placeholderTextColor='grey'
-            >
-
-            </Input>
-
+            />
           )}
           name="email"
         />
@@ -106,10 +110,8 @@ export function SignUp() {
               keyboardType='number-pad'
               placeholder="Telefone"
               placeholderTextColor='grey'
-            >
-
-            </Input>
-
+              mask={Masks.BRL_PHONE}
+            />
           )}
           name="telefone"
         />
@@ -123,12 +125,10 @@ export function SignUp() {
               onChangeText={onChange}
               value={value}
               keyboardType='number-pad'
-              placeholder="Idade"
+              placeholder="Data de Nascimento"
               placeholderTextColor='grey'
-            >
-
-            </Input>
-
+              mask={Masks.DATE_DDMMYYYY}
+            />
           )}
           name="age"
         />
@@ -144,10 +144,8 @@ export function SignUp() {
               keyboardType='number-pad'
               placeholder="CPF"
               placeholderTextColor='grey'
-            >
-
-            </Input>
-
+              mask={Masks.BRL_CPF}
+            />
           )}
           name="cpf"
         />
@@ -162,13 +160,11 @@ export function SignUp() {
               value={value}
               placeholder="Senha"
               placeholderTextColor='grey'
-            >
-
-            </Input>
-
+            />
           )}
           name="password"
         />
+
         <ButtonSubmit onPress={handleSubmit(onSubmit)}>
           <TitleButtonSubmit>Cadastrar</TitleButtonSubmit>
         </ButtonSubmit>

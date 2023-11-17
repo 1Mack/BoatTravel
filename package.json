@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@types/styled-components-react-native": "^5.2.3"
+  }
+}

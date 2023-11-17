@@ -1,4 +1,5 @@
-import React, { Alert, SafeAreaView } from 'react-native';
+//import env from 'react-native-dotenv'
+import React, { ActivityIndicator, Alert, SafeAreaView, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation, useNavigationState } from '@react-navigation/core';
 
 import Logo from '../../assets/logo.png'
@@ -24,22 +25,32 @@ import { RootStackParamList } from '../../routes/auth.routes';
 import { useAuth } from '../../hooks/AuthContext';
 import { useState } from 'react';
 import api from '../../services/api';
-
 type loginScreenProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
 export function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loadLogin, setLoadLogin] = useState(false)
+
   const { setUserAuth } = useAuth()
 
   const navigation = useNavigation<loginScreenProp>()
 
   async function handleLogin() {
-    const { data } = await api.post('/sessions', { email, password })
+    setLoadLogin(true)
+    const response = await api.post('/sessions', { email, password }).catch(m => undefined)
 
-    if (data['message']) return Alert.alert('Erro no Login', 'Combinação de Email/Senha errados')
+    if (!response) {
+      setLoadLogin(true)
+      return Alert.alert('Erro Interno')
+    }
 
-    setUserAuth({ id: data.user.id, email, token: data.token })
+    if (response.data['message']) {
+      setLoadLogin(true)
+      return Alert.alert('Erro no Login', 'Combinação de Email/Senha errados')
+    }
+
+    setUserAuth({ id: response.data.user.id, email, token: response.data.token })
 
   }
 
@@ -55,26 +66,28 @@ export function Login() {
 
           <ContentBody>
             <InputLogin
+              editable={!loadLogin}
               keyboardType='email-address'
               autoCapitalize="none"
               placeholder='Email'
-              onChangeText={(value) => setEmail(value)}
+              onChangeText={setEmail}
             />
 
             <InputLogin
+              editable={!loadLogin}
               placeholder='Senha'
-              onChangeText={(value) => setPassword(value)}
+              onChangeText={setPassword}
               secureTextEntry={true}
             />
 
-            <ButtonLogin onPress={handleLogin}>
-              <TitleButton>Entrar</TitleButton>
+            <ButtonLogin disabled={loadLogin} onPress={handleLogin} >
+              <TitleButton>{loadLogin ? <ActivityIndicator color={'#FFF'} /> : 'Entrar'}</TitleButton>
             </ButtonLogin>
             <ForgotPassword>Esqueceu a senha?</ForgotPassword>
           </ContentBody>
 
           <ContentFooter>
-            <ButtonSignUp title='Cadastrar' onPress={() => navigation.navigate('SignUp')} />
+            <ButtonSignUp disabled={loadLogin} style={{ opacity: loadLogin ? 0.5 : 1 }} title='Cadastrar' onPress={() => navigation.navigate('SignUp')} />
           </ContentFooter>
         </Container>
       </SafeAreaView>

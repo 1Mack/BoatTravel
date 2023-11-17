@@ -1,6 +1,5 @@
 import React, { Alert, Button, Dimensions, FlatList, Platform, SafeAreaView, StyleSheet, Text } from 'react-native';
 import MapView, { Callout, Marker } from 'react-native-maps';
-import config from '../../../config'
 import { Feather } from "@expo/vector-icons";
 
 import CalendarPicker from 'react-native-calendar-picker'
@@ -137,8 +136,6 @@ export function Home() {
     Alert.alert('Cadastrado com sucesso!')
 
   }
-  console.log(selectedBoat)
-
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -156,7 +153,7 @@ export function Home() {
             setLongitudeDelta(0.121)
           }}
           query={{
-            key: `${config.GOOGLE_PLACES_SECRET}`,
+            key: `${process.env.GOOGLE_PLACES_SECRET}`,
             language: 'pt-BR',
             components: "country:br",
             location: `${latitude}, ${longitude}`
@@ -171,6 +168,7 @@ export function Home() {
 
         <MapView
           onPress={() => {
+
             setSelectedBoat(null)
             bottomSheetRef.current?.close()
             setDateSelected('')

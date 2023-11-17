@@ -1,7 +1,7 @@
-import { TextInputProps } from "react-native";
+import { MaskInputProps } from 'react-native-mask-input'
 import { Container, InputStyle } from "./styles";
 
-export function Input({ ...rest }: TextInputProps) {
+export function Input({ ...rest }: MaskInputProps) {
   return (
     <Container>
       <InputStyle {...rest} />
